@@ -1,0 +1,4 @@
+wikipedia==1.4.0
+numpy==1.7.1
+word2vec==v0.8.1
+gensim==0.12.2
