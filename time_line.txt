@@ -1,0 +1,7 @@
+AI project for Kaggle
+Before Thanksgiving
+____Data Manipulation
+____Word2Vec playaround
+____t-SNE playaround
+____more....
+ 
