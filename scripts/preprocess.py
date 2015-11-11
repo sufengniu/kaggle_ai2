@@ -2,7 +2,7 @@ import csv
 import mmap
 import progressbar
 import wikipedia
-
+import fnmatch
 # import os
 import subprocess
 
@@ -80,7 +80,35 @@ class preprocess(object):
 				parseDict[ID]['D'] = D_WORD
 			bar.finish()
 		print 'parsing done'
-		
+	def parse_wiki(self,input_file):
+		"""
+		parse input file into two lists:
+		plain text
+		related word
+		"""
+		with open(input_file) as before_parsing:
+			temp = before_parsing.read()
+			refer_removed, sep, tail = temp.partition('== reference')
+			if not sep:
+				refer_removed, sep, tail = temp.partition('=== reference')
+			ext_removed, sep, tail = refer_removed.partition('== external link')
+			if not sep:
+				ext_removed, sep, tail = refer_removed.partition('=== external link')
+			main_contents, sep, relatedkeywords  = ext_removed.partition('== see also ==\n')
+			if not sep:
+				main_contents, sep, relatedkeywords  = ext_removed.partition('== see alsoedit ==')
+			relatedkeywords, sep, tail  = relatedkeywords.partition('==')
+			relatedkeyword = relatedkeywords.splitlines()
+
+			main_contents = main_contents.splitlines()
+			filtered = fnmatch.filter(main_contents,'=*=')
+			plaintext = []
+			for line in main_contents:
+				if not any(filteredword in line for filteredword in filtered):
+					plaintext.append(line)
+				else:
+					plaintext.append('\n')
+			print 'parsing wiki done'
 
 # initial test
 
