@@ -5,7 +5,7 @@ import wikipedia
 import fnmatch
 # import os
 import subprocess
-
+import os.path
 
 
 
@@ -109,7 +109,48 @@ class preprocess(object):
 				else:
 					plaintext.append('\n')
 			print 'parsing wiki done'
+		def traverse_wikidata(wikidata, dir_name, files):
+		'''
+		traverse_wikidata
+		function : traverse directory, parse wikipedia_txt_file 
+		input : gained from calltraverse_wiki
+		output : filename' '1' :[wiki plaintext] , '2' : [wiki_related_words]
+		'''
+			for line_main in files:
+				with open(dir_name + '/' + line_main ) as before_parsing:
+					temp = before_parsing.read()
+					refer_removed, sep, tail = temp.partition('== reference')
+					if not sep:
+						refer_removed, sep, tail = temp.partition('=== reference')
+					ext_removed, sep, tail = refer_removed.partition('== external link')
+					if not sep:
+						ext_removed, sep, tail = refer_removed.partition('=== external link')
+					main_contents, sep, relatedkeywords  = ext_removed.partition('== see also ==\n')
+					if not sep:
+						main_contents, sep, relatedkeywords  = ext_removed.partition('== see alsoedit ==')
+					relatedkeywords, sep, tail  = relatedkeywords.partition('==')
+					relatedkeyword = relatedkeywords.splitlines()
+					wikidata[line_main] = {}
+					wikidata[line_main]['2'] = relatedkeyword
+					main_contents = main_contents.splitlines()
+					filtered = fnmatch.filter(main_contents,'=*=')
+					plaintext = []
+					for line in main_contents:
+						if not any(filteredword in line for filteredword in filtered):
+							plaintext.append(line)
+						else:
+							plaintext.append('\n')
+					wikidata[line_main]['1'] = plaintext
+			# print wikidata
 
+		def calltraverse_wiki(dir_name):
+			'''
+			call traverse_wiki
+			input : wikipedia_txt_file_directory
+			output : 'filename' '1' :[wiki plaintext] , '2' : [wiki_related_words]
+			'''
+			wikidata = { }
+			os.path.walk(dir_name, traverse_wikidata, wikidata)
 # initial test
 
 preprocess('../data/training_set.tsv')
