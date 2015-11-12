@@ -80,6 +80,7 @@ class preprocess(object):
 				parseDict[ID]['D'] = D_WORD
 			bar.finish()
 		print 'parsing done'
+
 	def parse_wiki(self,input_file):
 		"""
 		parse input file into two lists:
@@ -109,6 +110,7 @@ class preprocess(object):
 				else:
 					plaintext.append('\n')
 			print 'parsing wiki done'
+
 		def traverse_wikidata(wikidata, dir_name, files):
 		'''
 		traverse_wikidata
@@ -141,7 +143,7 @@ class preprocess(object):
 						else:
 							plaintext.append('\n')
 					wikidata[line_main]['1'] = plaintext
-			# print wikidata
+			print 'parsing wiki txt done'
 
 		def calltraverse_wiki(dir_name):
 			'''
