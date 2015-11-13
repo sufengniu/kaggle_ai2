@@ -7,7 +7,7 @@ import fnmatch
 import subprocess
 import os.path
 
-
+import get_wikipedia_data
 
 
 parseDict = {}
@@ -20,20 +20,30 @@ class preprocess(object):
 		self.readDict = {}	
 		if input_file.endswith('.tsv'):		# tsv file
 			self.parse_tsv(input_file)
-		elif input_file.endswith('.xml'):	# wiki dump file (.xml)
-			self.load_wiki(input_file)
+		#elif input_file.endswith('.xml'):	# wiki dump file (.xml)
+		#	self.load_wiki(input_file)
 		else:
 			sys.exit("incorrect input file format, must be tsv (.tsv) and wikipedia dump files (.xml)")
 
+		self.gen_wiki()
+
+	'''
 	def load_wiki(self, input_file):
 		""" read wiki pre-train file """
 		print 'load wiki dump file (', input_file, ')...'
 		
-		# os.system('../utils/wikiextractor/WikiExtractor "%s"' % input_file)
-		subprocess.call("../utils/wikiextractor/WikiExtractor.py " + input_file, shell=True)
+		# os.system('utils/wikiextractor/WikiExtractor "%s"' % input_file)
+		subprocess.call("utils/wikiextractor/WikiExtractor.py " + input_file, shell=True)
 		
 		# self.wiki_parse()
+	'''
 
+	def gen_wiki(self):
+		print 'generating ck12 keywords list...'
+		subprocess.call("./scrape.py > data/ck12_list_keywords.txt", shell=True)	
+		print 'ck12 generating done, generating wiki plain text...'
+		subprocess.call(["mkdir", "data/wikipedia_sci"])
+		get_wikipedia_data.get_wikipedia_content_ck12_one_file_per_keyword('data/ck12_list_keywords.txt', 'data/wikipedia_sci')
 
 	def parse_tsv(self, input_file):	
 		""" read input tsv file and parse input file by \t.
@@ -112,12 +122,12 @@ class preprocess(object):
 			print 'parsing wiki done'
 
 		def traverse_wikidata(wikidata, dir_name, files):
-		'''
-		traverse_wikidata
-		function : traverse directory, parse wikipedia_txt_file 
-		input : gained from calltraverse_wiki
-		output : filename' '1' :[wiki plaintext] , '2' : [wiki_related_words]
-		'''
+			'''
+			traverse_wikidata
+			function : traverse directory, parse wikipedia_txt_file 
+			input : gained from calltraverse_wiki
+			output : filename' '1' :[wiki plaintext] , '2' : [wiki_related_words]
+			'''
 			for line_main in files:
 				with open(dir_name + '/' + line_main ) as before_parsing:
 					temp = before_parsing.read()
@@ -153,8 +163,11 @@ class preprocess(object):
 			'''
 			wikidata = { }
 			os.path.walk(dir_name, traverse_wikidata, wikidata)
+
+
+
 # initial test
 
-preprocess('../data/training_set.tsv')
-preprocess('../data/wikipedia_sci/wiki_sample.xml')
+preprocess('data/training_set.tsv')
+#preprocess('data/wikipedia_sci/wiki_sample.xml')
 

@@ -61,11 +61,11 @@ def get_wikipedia_content_based_on_word_count_train_validation(d_word_count):
                         file.write(line + '\n')
     file.close()
 
-def get_wikipedia_content_based_on_ck_12_keyword():
+def get_wikipedia_content_ck12_keyword():
     path_keyword = 'data/ck12_list_keyword.txt'
     lst_keyword = open(path_keyword).readlines()
     n_total = len(lst_keyword)
-    file = open('data/wikipedia_content_based_on_ck_12_keyword_v1.txt', 'w')
+    file = open('data/wikipedia_sci.txt', 'w')
     for index, line in enumerate(lst_keyword):
         keyword = line.strip('\n').lower()
         print index, n_total, index * 1.0 / n_total, keyword
@@ -83,8 +83,8 @@ def get_wikipedia_content_based_on_ck_12_keyword():
                 file.write(line + '\n')
     file.close()
 
-def get_wikipedia_content_based_on_ck_12_keyword_one_file_per_keyword():
-    path_keyword = 'data/ck12_list_keyword.txt'
+def get_wikipedia_content_ck12_one_file_per_keyword(ck12_keywords, wiki_dir):
+    path_keyword = ck12_keywords
     lst_keyword = open(path_keyword).readlines()
     n_total = len(lst_keyword)
     for index, line in enumerate(lst_keyword):
@@ -98,15 +98,15 @@ def get_wikipedia_content_based_on_ck_12_keyword_one_file_per_keyword():
             print 'Error', keyword
         if not content:
             continue
-        file = open('data/wikipedia_content_based_on_ck_12_keyword_one_file_per_keyword/' + '_'.join(keyword.split()) + '.txt', 'w')
+        file = open(wiki_dir + '_'.join(keyword.split()) + '.txt', 'w')
         for line in content.split('\n'):
             line = ' '.join(map(util.norm_word, line.split()))
             if line:
                 file.write(line + '\n')
         file.close()
 
-get_wikipedia_content_based_on_ck_12_keyword_one_file_per_keyword()
-#get_wikipedia_content_based_on_ck_12_keyword()
+#get_wikipedia_content_ck12_one_file_per_keyword(ck12_keywords, wiki_dir)
+#get_wikipedia_content_ck12_keyword()
 '''
 d = get_word_count_train_validation()
 get_wikipedia_content_based_on_word_count_train_validation(d)
