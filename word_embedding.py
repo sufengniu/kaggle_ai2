@@ -31,8 +31,9 @@ class w2v_model(object):
     def train(self, sentences):
     	# ignore words less then 5 times, parallel threads to be 8, 100 neuron size (50 to 100)	
 		bigram_transformer = gensim.models.Phrases(sentences)
-		self.model = Word2Vec(bigram_transformer[sentences], min_count=5, size=100, window=5, workers=8)
+		self.model = Word2Vec(bigram_transformer[sentences], min_count=5, size=150, window=5, workers=8)
 		self.model.save('models/mymodel')
+		self.model.save_word2vec_format('models/vector')
 		#self.model.init_sims(replace=True)
 		#self.model.build_vocab()
 
