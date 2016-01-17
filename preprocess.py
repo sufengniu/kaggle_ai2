@@ -20,12 +20,13 @@ class preprocess(object):
 		self.readDict = {}	
 		if input_file.endswith('.tsv'):		# tsv file
 			self.parse_tsv(input_file)
+			#self.parse_tsv_cnn(input_file)
 		#elif input_file.endswith('.xml'):	# wiki dump file (.xml)
 		#	self.load_wiki(input_file)
 		else:
 			sys.exit("incorrect input file format, must be tsv (.tsv) and wikipedia dump files (.xml)")
 
-		self.gen_wiki()
+		#self.gen_wiki()
 
 	'''
 	def load_wiki(self, input_file):
@@ -60,12 +61,13 @@ class preprocess(object):
 		with open(input_file, 'rb') as csvfile:
 			self.readDict = csv.DictReader(csvfile, delimiter='\t', quotechar=' ')
 			lineNum = sum(1 for line in self.readDict)	
-			bar = progressbar.ProgressBar(maxval = lineNum, \
-					widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()]).start()
+			#bar = progressbar.ProgressBar(maxval = lineNum, \
+			#		widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()]).start()
 			print 'load file done, parse the input'
 			i = 0
 			for line in self.readDict:
-				bar.update(i+1)
+				print("!!!!!!")
+				#bar.update(i+1)
 				csv.DictReader(csvfile, delimiter='\t', quotechar=' ')		
 				ID = line['id'].strip()
 				QUESTION = line['question'].strip()
@@ -88,6 +90,107 @@ class preprocess(object):
 				parseDict[ID]['B'] = B_WORD
 				parseDict[ID]['C'] = C_WORD
 				parseDict[ID]['D'] = D_WORD
+			#bar.finish()
+			print 'parsing done'
+
+	def parse_tsv_cnn(self, input_file):	
+		""" read input tsv file and parse input file by \t.
+			format each question as following:
+			question id: use id to query each question contents
+			question contents
+			answer (A/B/C/D)
+			selection A
+			selection B
+			selection C
+			selection D
+		"""	
+		print 'load tsv input file (', input_file, ')...'
+		with open(input_file, 'rb') as csvfile:
+			self.readDict = csv.DictReader(csvfile, delimiter='\t', quotechar=' ')
+			lineNum = sum(1 for line in self.readDict)	
+			bar = progressbar.ProgressBar(maxval = lineNum, \
+					widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()]).start()
+			print 'load file done, parse the input'
+			i = 0
+			for line in self.readDict:
+				bar.update(i+1)
+				csv.DictReader(csvfile, delimiter='\t', quotechar=' ')	
+				ID = line['id'].strip()
+				QUESTION = line['question'].strip()
+				QUESTION_WORD = QUESTION.split()
+				CORRECTANSWER = line['correctAnswer'].strip()
+				CORRECTANSWER_WORD = CORRECTANSWER.split()
+				A = line['A'].strip()
+				A_WORD = A.split()
+				B = line['B'].strip()
+				B_WORD = B.split()
+				C = line['C'].strip()
+				C_WORD = C.split()
+				D = line['D'].strip()
+				D_WORD = D.split()
+
+				parseDict[ID] = {}
+				parseDict[ID]['question'] = QUESTION_WORD
+				parseDict[ID]['correctAnswer'] = CORRECTANSWER_WORD
+				parseDict[ID]['A'] = A_WORD
+				parseDict[ID]['B'] = B_WORD
+				parseDict[ID]['C'] = C_WORD
+				parseDict[ID]['D'] = D_WORD
+				pos = open('./data/rt-polarity.pos','w')
+				neg = open('./data/rt-polarity.neg','w')	
+				if parseDict[ID]['correctAnswer'] == 'A':	
+					print("processing answer A")				
+					pos.wirte(parseDict[ID]['question'])
+					pos.wirte(parseDict[ID]['A'])		
+					pos.wirte('\n')
+					neg.wirte(parseDict[ID]['question'])
+					neg.wirte(parseDict[ID]['B'])
+					neg.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['C'])
+                                        neg.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['D'])
+                                        neg.wirte('\n')
+				elif parseDict[ID]['correctAnswer'] == 'B':
+                                        pos.wirte(parseDict[ID]['question'])
+                                        pos.wirte(parseDict[ID]['B'])
+                                        pos.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['A'])
+                                        neg.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['C'])
+                                        neg.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['D'])
+                                        neg.wirte('\n')
+                                elif parseDict[ID]['correctAnswer'] == 'C':
+                                        pos.wirte(parseDict[ID]['question'])
+                                        pos.wirte(parseDict[ID]['C'])
+                                        pos.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['A'])
+                                        neg.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['B'])
+					neg.wirte('\n')
+					neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['D'])
+                                        neg.wirte('\n')
+                                elif parseDict[ID]['correctAnswer'] == 'D':
+                                 	pos.wirte(parseDict[ID]['question'])
+                                        pos.wirte(parseDict[ID]['D'])
+                                        pos.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['A'])
+                                        neg.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['B'])
+                                        neg.wirte('\n')
+                                        neg.wirte(parseDict[ID]['question'])
+                                        neg.wirte(parseDict[ID]['C'])
+                                        neg.wirte('\n')
 			bar.finish()
 		print 'parsing done'
 
@@ -170,4 +273,5 @@ class preprocess(object):
 
 preprocess('data/training_set.tsv')
 #preprocess('data/wikipedia_sci/wiki_sample.xml')
+
 
