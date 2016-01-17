@@ -61,13 +61,13 @@ class preprocess(object):
 		with open(input_file, 'rb') as csvfile:
 			self.readDict = csv.DictReader(csvfile, delimiter='\t', quotechar=' ')
 			lineNum = sum(1 for line in self.readDict)	
-			#bar = progressbar.ProgressBar(maxval = lineNum, \
-			#		widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()]).start()
+			csvfile.seek(0)
+			bar = progressbar.ProgressBar(maxval = lineNum, \
+					widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()]).start()
 			print 'load file done, parse the input'
 			i = 0
-			for line in self.readDict:
-				print("!!!!!!")
-				#bar.update(i+1)
+			for line in self.readDict:	
+				bar.update(i+1)
 				csv.DictReader(csvfile, delimiter='\t', quotechar=' ')		
 				ID = line['id'].strip()
 				QUESTION = line['question'].strip()
@@ -90,7 +90,7 @@ class preprocess(object):
 				parseDict[ID]['B'] = B_WORD
 				parseDict[ID]['C'] = C_WORD
 				parseDict[ID]['D'] = D_WORD
-			#bar.finish()
+			bar.finish()
 			print 'parsing done'
 
 	def parse_tsv_cnn(self, input_file):	
